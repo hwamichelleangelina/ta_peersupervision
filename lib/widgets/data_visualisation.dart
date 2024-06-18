@@ -22,6 +22,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   late Future<List<TopPSJadwal>> topMentorsSessions;
   late Future<Map<String, List<ClientDistribution>>> clientDistribution;
   late Future<List<Topic>> topTopics;
+  late Future<List<TopicPairs>> topTopicPairs;
   late Future<List<Recommendation>> recommendationRatio;
   late Future<List<PotentialRujuk>> potentialRujuk;
   late Future<List<TopTopicsByMonth>> topTopicsByMonth;
@@ -39,6 +40,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       topMentorsSessions = repository.getTopPSJadwal(year);
       clientDistribution = repository.getClientDistribution(year);
       topTopics = repository.getTopTopics(year);
+      topTopicPairs = repository.getTopTopicPairs(year);
       recommendationRatio = repository.getRecommendationRatio(year);
       potentialRujuk = repository.getPotentialRujuk(year);
       topTopicsByMonth = repository.getTopTopicsByMonth(year);
@@ -74,7 +76,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Column(
                 children: [
                   const SizedBox(height: 20),
-                  _buildSectionTitle('Topik Permasalahan Dampingan per Bulan'),
+                  _buildSectionTitle('Topik Utama Permasalahan Dampingan per Bulan'),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: Center(
@@ -91,7 +93,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),),
                   ),
                   const SizedBox(height: 10),
-                  _buildTopTopicsByMonthChart(), ])
+                  _buildTopTopicsByMonthChart(topTopicsByMonth), ])
             else
               const SizedBox(height: 5),
 
@@ -227,7 +229,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),),
             const SizedBox(height: 20.0),
           
-            _buildSectionTitle('Topik Permasalahan Dampingan Terpopuler'),
+            _buildSectionTitle('Kata Kunci Utama Permasalahan Dampingan Terpopuler'),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Center(
@@ -237,6 +239,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
             const SizedBox(height: 10),
             _buildTopTopicsChart(),
             const SizedBox(height: 30.0),
+
+            Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Center(
+                    child: _buildSectionTitle('Pasangan Kata Kunci Masalah Terbanyak'),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Center(
+                    child: Text('(${selectedYear == 0 ? 'All Time' : selectedYear})'),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: Center(
+                    child: Align(alignment: Alignment.center,
+                    child: Text('Pasangan kata kunci permasalahan terpopuler',
+                      textAlign: TextAlign.center,),
+                  ),),
+                ),
+                const SizedBox(height: 10),
+                _buildTopTopicPairsTable(),
+              ],
+            ),
+            const SizedBox(height: 20.0),
 
             const SizedBox(height: 20.0),
             const Padding(
@@ -401,6 +432,7 @@ Widget _buildYearDropdown() {
                 topMentorsSessions = repository.getTopPSJadwalAllTime();
                 clientDistribution = repository.getClientDistributionAllTime();
                 topTopics = repository.getTopTopicsAllTime();
+                topTopicPairs = repository.getTopTopicPairsAllTime();
                 recommendationRatio = repository.getRecommendationRatioAllTime();
                 potentialRujuk = repository.getPotentialRujukAllTime();
               } else {
@@ -477,8 +509,51 @@ Widget _buildYearDropdown() {
                     color: charts.MaterialPalette.white,
                   ),
               ),
+              domainAxis: const charts.OrdinalAxisSpec(
+                renderSpec: charts.SmallTickRendererSpec(
+                  labelStyle: charts.TextStyleSpec(
+                    fontSize: 12,
+                    color: charts.MaterialPalette.white,
+                  ),
+                  lineStyle: charts.LineStyleSpec(
+                    color: charts.MaterialPalette.white, // Gridline color
+                  ),
+                )
+              )
             ),
           )
+          );
+        }
+      },
+    );
+  }
+
+  // _buildTopTopicPairsTable
+  Widget _buildTopTopicPairsTable() {
+    return FutureBuilder<List<TopicPairs>>(
+      future: topTopicPairs,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Text('Tidak ada kata kunci permasalahan terbanyak');
+        } else {
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: DataTable(
+              columns: const [
+                DataColumn(label: Text('Pasangan Kata Kunci')),
+                DataColumn(label: Text('Jumlah')),
+              ],
+              rows: snapshot.data!
+                  .map((topicpairs) => DataRow(cells: [
+                        DataCell(Text('${topicpairs.katakunci} - ${topicpairs.katakunci2 ?? 'Umum'}')),
+                        DataCell(Text(topicpairs.count.toString())),
+                      ]))
+                  .toList(),
+            ),
           );
         }
       },
@@ -647,7 +722,10 @@ Widget _buildYearDropdown() {
             [
               charts.Series<ClientDistribution, String>(
                 id: title,
-                colorFn: (_, idx) => charts.MaterialPalette.getOrderedPalettes(data.length)[idx!.toInt()].shadeDefault,
+                colorFn: (_, idx) {
+                  final palettes = charts.MaterialPalette.getOrderedPalettes(data.length);
+                  return palettes[idx! % palettes.length].shadeDefault;
+                },
                 domainFn: (ClientDistribution dist, _) => dist.category,
                 measureFn: (ClientDistribution dist, _) => dist.count,
                 data: data,
@@ -676,6 +754,7 @@ Widget _buildYearDropdown() {
       ],
     );
   }
+
 
   Widget _buildTopTopicsTable() {
     return FutureBuilder<List<Topic>>(
@@ -733,6 +812,7 @@ Widget _buildYearDropdown() {
                     labelAccessorFn: (Topic topic, _) => '${topic.count}',
                   ),
                 ],
+                vertical: false,
                 primaryMeasureAxis: const charts.NumericAxisSpec(
                   renderSpec: charts.GridlineRendererSpec(
                     // Customize gridline style
@@ -752,7 +832,18 @@ Widget _buildYearDropdown() {
                     fontFamily: 'Montserrat',
                     color: charts.MaterialPalette.white,
                   ),
-              ),
+                ),
+                domainAxis: const charts.OrdinalAxisSpec(
+                  renderSpec: charts.SmallTickRendererSpec(
+                    labelStyle: charts.TextStyleSpec(
+                      fontSize: 12,
+                      color: charts.MaterialPalette.white,
+                    ),
+                    lineStyle: charts.LineStyleSpec(
+                      color: charts.MaterialPalette.white, // Gridline color
+                    ),
+                  )
+                )
             ),
           )
           );
@@ -761,120 +852,134 @@ Widget _buildYearDropdown() {
     );
   }
 
-Widget _buildTopTopicsByMonthChart() {
-  return FutureBuilder<List<TopTopicsByMonth>>(
-    future: topTopicsByMonth,
-    builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        return const CircularProgressIndicator();
-      } else if (snapshot.hasError) {
-        return Text('Error: ${snapshot.error}');
-      } else {
-        // Prepare data for stacked bar chart
-        final data = snapshot.data!;
-        final Map<String, Map<String, int>> monthlyData = {};
+  Widget _buildTopTopicsByMonthChart(Future<List<TopTopicsByMonth>> topTopicsByMonth) {
+    return FutureBuilder<List<TopTopicsByMonth>>(
+      future: topTopicsByMonth,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: Text('No data available'));
+        } else {
+          // Prepare data for stacked bar chart
+          final data = snapshot.data!;
+          final Map<int, Map<String, int>> monthlyData = {};
 
-        for (var topic in data) {
-          if (!monthlyData.containsKey(topic.month)) {
-            monthlyData[topic.month] = {};
+          for (var topic in data) {
+            if (!monthlyData.containsKey(topic.month)) {
+              monthlyData[topic.month] = {};
+            }
+            if (!monthlyData[topic.month]!.containsKey(topic.katakunci)) {
+              monthlyData[topic.month]![topic.katakunci] = 0;
+            }
+            monthlyData[topic.month]![topic.katakunci] =
+                monthlyData[topic.month]![topic.katakunci]! + topic.count;
           }
-          if (!monthlyData[topic.month]!.containsKey(topic.katakunci)) {
-            monthlyData[topic.month]![topic.katakunci] = 0;
+
+          final List<charts.Series<TopTopicsByMonth, String>> seriesList = [];
+
+          final uniqueKeywords = data.map((e) => e.katakunci).toSet().toList();
+          final colors = charts.MaterialPalette.getOrderedPalettes(uniqueKeywords.length);
+
+          for (int i = 0; i < uniqueKeywords.length; i++) {
+            final keyword = uniqueKeywords[i];
+            final color = colors[i].shadeDefault;
+
+            seriesList.add(charts.Series<TopTopicsByMonth, String>(
+              id: keyword,
+              colorFn: (_, __) => color,
+              domainFn: (TopTopicsByMonth topic, _) => _formatMonth(topic.month),
+              measureFn: (TopTopicsByMonth topic, _) => topic.count,
+              data: monthlyData.entries
+                  .map((entry) => TopTopicsByMonth(
+                        katakunci: keyword,
+                        month: entry.key,
+                        count: entry.value[keyword] ?? 0,
+                      ))
+                  .toList(),
+              labelAccessorFn: (TopTopicsByMonth topic, _) =>
+                  topic.count > 0 ? '${topic.count}' : '',
+            ));
           }
-          monthlyData[topic.month]![topic.katakunci] =
-              monthlyData[topic.month]![topic.katakunci]! + topic.count;
-        }
 
-        final List<charts.Series<TopTopicsByMonth, String>> seriesList = [];
-
-        final uniqueKeywords = data.map((e) => e.katakunci).toSet().toList();
-        final colors = charts.MaterialPalette.getOrderedPalettes(uniqueKeywords.length);
-
-        for (int i = 0; i < uniqueKeywords.length; i++) {
-          final keyword = uniqueKeywords[i];
-          final color = colors[i].shadeDefault;
-
-          seriesList.add(charts.Series<TopTopicsByMonth, String>(
-            id: keyword,
-            colorFn: (_, __) => color,
-            domainFn: (TopTopicsByMonth topic, _) => topic.month,
-            measureFn: (TopTopicsByMonth topic, _) => topic.count,
-            data: monthlyData.entries
-                .map((entry) => TopTopicsByMonth(
-                      katakunci: keyword,
-                      month: entry.key,
-                      count: entry.value[keyword] ?? 0,
-                    ))
-                .toList(),
-            labelAccessorFn: (TopTopicsByMonth topic, _) =>
-                topic.count > 0 ? '${topic.count}' : '',
-          ));
-        }
-
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: SizedBox(
-            height: 470, // Increase the height to make space for the legend
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                int desiredMaxColumns = 2;
-                return charts.BarChart(
-                  seriesList,
-                  barGroupingType: charts.BarGroupingType.stacked,
-                  animate: true,
-                  primaryMeasureAxis: const charts.NumericAxisSpec(
-                    renderSpec: charts.GridlineRendererSpec(
-                      // Customize gridline style
-                      labelStyle: charts.TextStyleSpec(
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: SizedBox(
+              height: 470, // Increase the height to make space for the legend
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  int desiredMaxColumns = 2;
+                  return charts.BarChart(
+                    seriesList,
+                    barGroupingType: charts.BarGroupingType.stacked,
+                    animate: true,
+                    primaryMeasureAxis: const charts.NumericAxisSpec(
+                      renderSpec: charts.GridlineRendererSpec(
+                        // Customize gridline style
+                        labelStyle: charts.TextStyleSpec(
+                          fontFamily: 'Montserrat',
+                          color: charts.MaterialPalette.white,
+                        ),
+                        lineStyle: charts.LineStyleSpec(
+                          color: charts.MaterialPalette.white, // Gridline color
+                        ),
+                      ),
+                    ),
+                    domainAxis: const charts.OrdinalAxisSpec(
+                      renderSpec: charts.SmallTickRendererSpec(
+                        labelStyle: charts.TextStyleSpec(
+                          fontFamily: 'Montserrat',
+                          color: charts.MaterialPalette.white,
+                        ),
+                        lineStyle: charts.LineStyleSpec(
+                          color: charts.MaterialPalette.white,
+                        ),
+                      ),
+                    ),
+                    barRendererDecorator: charts.BarLabelDecorator<String>(
+                      labelAnchor: charts.BarLabelAnchor.end,
+                      labelPosition: charts.BarLabelPosition.outside,
+                      outsideLabelStyleSpec: const charts.TextStyleSpec(
                         fontFamily: 'Montserrat',
                         color: charts.MaterialPalette.white,
                       ),
-                      lineStyle: charts.LineStyleSpec(
-                        color: charts.MaterialPalette.white, // Gridline color
-                      ),
                     ),
-                  ),
-                  domainAxis: const charts.OrdinalAxisSpec(
-                    renderSpec: charts.SmallTickRendererSpec(
-                      labelStyle: charts.TextStyleSpec(
-                        fontFamily: 'Montserrat',
-                        color: charts.MaterialPalette.white,
+                    behaviors: [
+                      charts.SeriesLegend(
+                        position: charts.BehaviorPosition.bottom,
+                        horizontalFirst: true,
+                        showMeasures: false, // Do not show measures
+                        legendDefaultMeasure: charts.LegendDefaultMeasure.none,
+                        entryTextStyle: const charts.TextStyleSpec(
+                          color: charts.MaterialPalette.white, // Legend font color
+                          fontSize: 10,
+                        ),
+                        desiredMaxColumns: desiredMaxColumns, // Set desired max columns
                       ),
-                      lineStyle: charts.LineStyleSpec(
-                        color: charts.MaterialPalette.white,
-                      ),
-                    ),
-                  ),
-                  barRendererDecorator: charts.BarLabelDecorator<String>(
-                    labelAnchor: charts.BarLabelAnchor.end,
-                    labelPosition: charts.BarLabelPosition.outside,
-                    outsideLabelStyleSpec: const charts.TextStyleSpec(
-                      fontFamily: 'Montserrat',
-                      color: charts.MaterialPalette.white,
-                    ),
-                  ),
-                  behaviors: [
-                    charts.SeriesLegend(
-                      position: charts.BehaviorPosition.bottom,
-                      horizontalFirst: true,
-                      showMeasures: false, // Do not show measures
-                      legendDefaultMeasure: charts.LegendDefaultMeasure.none,
-                      entryTextStyle: const charts.TextStyleSpec(
-                        color: charts.MaterialPalette.white, // Legend font color
-                        fontSize: 10,
-                      ),
-                      desiredMaxColumns: desiredMaxColumns, // Set desired max columns
-                    ),
-                  ],
-                );
-              }
+                    ],
+                  );
+                }
+              ),
             ),
-          ),
-        );
-      }
-    },
-  );
-}
+          );
+        }
+      },
+    );
+  }
+
+  String _formatMonth(int month) {
+    int year = selectedYear;
+    List<String> months = [
+      '$year-01', '$year-02', '$year-03', '$year-04', '$year-05', '$year-06',
+      '$year-07', '$year-08', '$year-09', '$year-10', '$year-11', '$year-12'
+    ];
+    if (month >= 1 && month <= 12) {
+      return months[month - 1];
+    }
+    return month.toString(); // Fallback to the number if out of range
+  }
 
   Widget _buildRecommendationRatioChart() {
     return FutureBuilder<List<Recommendation>>(

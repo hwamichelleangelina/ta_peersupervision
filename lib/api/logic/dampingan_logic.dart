@@ -5,12 +5,14 @@ class Dampingan {
   int? angkatan;
   String? gender;
   String? kampus;
-  String mediakontak;
-  String kontak;
-  String katakunci;
-  String sesi;
+  String? mediakontak;
+  String? kontak;
+  String? katakunci;
+  String? katakunci2;
+  String? sesi;
   int? psnim;
   String? psname;
+  String? tingkat;
 
   Dampingan({
     this.reqid,
@@ -19,12 +21,14 @@ class Dampingan {
     this.angkatan,
     this.gender,
     this.kampus,
-    required this.mediakontak,
-    required this.kontak,
-    required this.katakunci,
-    required this.sesi,
+    this.mediakontak,
+    this.kontak,
+    this.katakunci,
+    this.katakunci2,
+    this.sesi,
     this.psnim,
     this.psname,
+    this.tingkat,
   });
 
   factory Dampingan.fromJson(Map<String, dynamic> json) {
@@ -39,9 +43,11 @@ class Dampingan {
       mediakontak: json['mediakontak'],
       kontak: json['kontak'],
       katakunci: json['katakunci'],
+      katakunci2: json['katakunci2'],
       sesi: json['sesi'],
       psnim: json['psnim'],
       psname: json['psname'],
+      tingkat: json['tingkat']
     );
   }
 
@@ -57,9 +63,11 @@ class Dampingan {
     data['mediakontak'] = mediakontak;
     data['kontak'] = kontak;
     data['katakunci'] = katakunci;
+    data['katakunci2'] = katakunci2;
     data['sesi'] = sesi;
     data['psnim'] = psnim;
     data['psname'] = psname;
+    data['tingkat'] = tingkat;
 
     return data;
   }

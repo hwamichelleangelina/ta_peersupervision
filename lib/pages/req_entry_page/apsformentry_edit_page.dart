@@ -8,6 +8,8 @@ import 'package:ta_peersupervision/api/logic/psusers_logic.dart';
 import 'package:ta_peersupervision/api/provider/dampingan_provider.dart';
 import 'package:ta_peersupervision/api/repository/dampingan_repository.dart';
 import 'package:ta_peersupervision/api/repository/psusers_repository.dart';
+import 'package:ta_peersupervision/api/repository/rujukan_repository.dart.dart';
+import 'package:ta_peersupervision/widgets/footer.dart';
 
 class DampinganFormPage extends StatefulWidget {
   const DampinganFormPage({super.key});
@@ -18,19 +20,31 @@ class DampinganFormPage extends StatefulWidget {
 
 class _DampinganFormPageState extends State<DampinganFormPage> {
   final _formKey = GlobalKey<FormState>();
-  String? initial;
-  String? fakultas;
+  final TextEditingController _initialController = TextEditingController();
+  final TextEditingController _angkatanController = TextEditingController();
+  final TextEditingController _kontakController = TextEditingController();
+
   String? gender;
+  String? fakultas;
   String? kampus;
-  int? angkatan;
+  String? tingkat;
   String? mediakontak;
   String? katakunci;
+  String? katakunci2;
   String? sesi;
   String? psname;
-  String? kontak;
 
   PSUsersRepository repository = PSUsersRepository();
   DampinganRepository dampinganRepo = DampinganRepository();
+  RujukanRepository rujukan = RujukanRepository();
+
+  @override
+  void dispose() {
+    _initialController.dispose();
+    _angkatanController.dispose();
+    _kontakController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,21 +61,20 @@ class _DampinganFormPageState extends State<DampinganFormPage> {
           child: ListView(
             children: [
               const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 30.0),  // Margin untuk judul,
+                padding: EdgeInsets.symmetric(horizontal: 30.0),
                 child: Text(
                   textAlign: TextAlign.center,
                   'Informasi Permintaan Pendampingan',
                   style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                 ),
               ),
-
               const SizedBox(height: 20,),
-
               TextFormField(
+                controller: _initialController,
                 decoration: const InputDecoration(
                   labelText: 'Inisial Dampingan',
                   border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0), // Spasi kanan kiri
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -69,19 +82,15 @@ class _DampinganFormPageState extends State<DampinganFormPage> {
                   }
                   return null;
                 },
-                onSaved: (value) {
-                  initial = value;
-                },
               ),
-
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 decoration: const InputDecoration(
                   labelText: 'Gender',
                   border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0), // Spasi kanan kiri
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
                 ),
-                items: ['L', 'P'].map((String gender) {
+                items: ['Laki-laki', 'Perempuan'].map((String gender) {
                   return DropdownMenuItem<String>(
                     value: gender,
                     child: Text(gender),
@@ -92,14 +101,14 @@ class _DampinganFormPageState extends State<DampinganFormPage> {
                     gender = value;
                   });
                 },
+                value: gender,
               ),
-
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 decoration: const InputDecoration(
                   labelText: 'Fakultas',
                   border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0), // Spasi kanan kiri
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
                 ),
                 items: [
                   'STEI', 'SBM', 'FTTM', 'SITH', 'FTSL', 'FMIPA', 'SF', 'FSRD', 'FTMD', 'FTI', 'FITB', 'SAPPK', 'Lain-lain'
@@ -114,16 +123,16 @@ class _DampinganFormPageState extends State<DampinganFormPage> {
                     fakultas = value;
                   });
                 },
+                value: fakultas,
               ),
-
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 decoration: const InputDecoration(
                   labelText: 'Kampus',
                   border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0), // Spasi kanan kiri
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
                 ),
-                items: ['Ganesha', 'Cirebon', 'Jatinangor'].map((String kampus) {
+                items: ['ITB Ganesha', 'ITB Cirebon', 'ITB Jatinangor'].map((String kampus) {
                   return DropdownMenuItem<String>(
                     value: kampus,
                     child: Text(kampus),
@@ -134,31 +143,52 @@ class _DampinganFormPageState extends State<DampinganFormPage> {
                     kampus = value;
                   });
                 },
+                value: kampus,
               ),
               const SizedBox(height: 16),
               TextFormField(
+                controller: _angkatanController,
                 decoration: const InputDecoration(
                   labelText: 'Angkatan',
                   border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0), // Spasi kanan kiri
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
                 ),
                 keyboardType: TextInputType.number,
                 validator: (value) {
-                  if (int.tryParse(value!) == null) {
-                    return 'Angkatan harus berupa angka';
+                  if (value != null) {
+                    if (int.tryParse(value) == null) {
+                      return 'Angkatan harus berupa angka';
+                    }
                   }
                   return null;
                 },
-                onSaved: (value) {
-                  angkatan = int.tryParse(value!);
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                decoration: const InputDecoration(
+                  labelText: 'Tingkat',
+                  border: OutlineInputBorder(),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
+                ),
+                items: ['Sarjana', 'Pascasarjana'].map((String tingkat) {
+                  return DropdownMenuItem<String>(
+                    value: tingkat,
+                    child: Text(tingkat),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    tingkat = value;
+                  });
                 },
+                value: tingkat,
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 decoration: const InputDecoration(
                   labelText: 'Media Kontak',
                   border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0), // Spasi kanan kiri
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
                 ),
                 items: ['WA', 'Email', 'Line'].map((String mediakontak) {
                   return DropdownMenuItem<String>(
@@ -177,15 +207,15 @@ class _DampinganFormPageState extends State<DampinganFormPage> {
                   }
                   return null;
                 },
+                value: mediakontak,
               ),
-
               const SizedBox(height: 16),
-
               TextFormField(
+                controller: _kontakController,
                 decoration: const InputDecoration(
                   labelText: 'Kontak Dampingan',
                   border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0), // Spasi kanan kiri
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -193,17 +223,13 @@ class _DampinganFormPageState extends State<DampinganFormPage> {
                   }
                   return null;
                 },
-                onSaved: (value) {
-                  kontak = value;
-                },
               ),
-
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 decoration: const InputDecoration(
                   labelText: 'Kata Kunci',
                   border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0), // Spasi kanan kiri
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
                 ),
                 items: [
                   'Akademik', 'Finansial', 'Keluarga', 'Percintaan', 'Kehidupan Kampus', 'Kesehatan', 'Karir dan Masa Depan', 'Lain-lain'
@@ -224,13 +250,36 @@ class _DampinganFormPageState extends State<DampinganFormPage> {
                   }
                   return null;
                 },
+                value: katakunci,
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String?>(
+                decoration: const InputDecoration(
+                  labelText: 'Kata Kunci Tambahan',
+                  border: OutlineInputBorder(),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
+                ),
+                items: [
+                  'Akademik', 'Finansial', 'Keluarga', 'Percintaan', 'Kehidupan Kampus', 'Kesehatan', 'Karir dan Masa Depan', 'Lain-lain'
+                ].map((String? katakunci2) {
+                  return DropdownMenuItem<String>(
+                    value: katakunci2,
+                    child: Text(katakunci2 ?? 'Pilih kata kunci tambahan'),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    katakunci2 = value;
+                  });
+                },
+                value: katakunci2,
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 decoration: const InputDecoration(
                   labelText: 'Sesi',
                   border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0), // Spasi kanan kiri
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
                 ),
                 items: ['Online', 'Offline'].map((String sesi) {
                   return DropdownMenuItem<String>(
@@ -249,10 +298,11 @@ class _DampinganFormPageState extends State<DampinganFormPage> {
                   }
                   return null;
                 },
+                value: sesi,
               ),
               const SizedBox(height: 16),
               FutureBuilder<List<ActiveUser>>(
-                future: repository.fetchPSNames(), // Fungsi untuk mengambil data nama pendamping dari database
+                future: repository.fetchPSNames(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const CircularProgressIndicator();
@@ -293,23 +343,26 @@ class _DampinganFormPageState extends State<DampinganFormPage> {
                   if (_formKey.currentState!.validate()) {
                     _formKey.currentState!.save();
                     Dampingan dampingan = Dampingan(
-                      initial: initial!,
+                      initial: _initialController.text,
                       fakultas: fakultas,
                       gender: gender,
                       kampus: kampus,
-                      angkatan: angkatan,
+                      angkatan: int.tryParse(_angkatanController.text),
                       mediakontak: mediakontak!,
-                      kontak: kontak!,
+                      kontak: _kontakController.text,
                       sesi: sesi!,
-                      psname: psname, katakunci: katakunci!,
+                      psname: psname,
+                      katakunci: katakunci!,
+                      katakunci2: katakunci2,
+                      tingkat: tingkat!
                     );
-                    
+
                     dampinganRepo.importDampingan(dampingan: dampingan).then((value) async {
                       Get.toNamed('/aps-requests');
                       await provider.fetchDampingan();
-                    }); 
-                    Get.snackbar('Tambah Permintaan Pendampingan Baru', 'Data Dampingan $initial berhasil disimpan',
-                      backgroundColor: Colors.green, colorText: Colors.white);  
+                    });
+                    Get.snackbar('Tambah Permintaan Pendampingan Baru', 'Data Dampingan ${_initialController.text} berhasil disimpan',
+                        backgroundColor: Colors.green, colorText: Colors.white);
                   }
                 },
                 style: ElevatedButton.styleFrom(
@@ -318,6 +371,8 @@ class _DampinganFormPageState extends State<DampinganFormPage> {
                 ),
                 child: const Text('Simpan'),
               ),
+              const SizedBox(height: 30,),
+              const Footer(),
             ],
           ),
         ),

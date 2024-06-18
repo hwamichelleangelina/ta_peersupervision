@@ -56,10 +56,15 @@ class _DampinganListState extends State<DampinganList> {
                 Text('Gender: ${item.gender ?? 'N/A'}'),
                 Text('Fakultas: ${item.fakultas ?? 'N/A'}'),
                 Text('Angkatan: ${item.angkatan ?? 'N/A'}'),
+                Text('Tingkat: ${item.tingkat ?? 'N/A'}'),
                 Text('Kampus: ${item.kampus ?? 'N/A'}'),
                 Text('Media Kontak: ${item.mediakontak}'),
                 Text('Kontak: ${item.kontak}'),
-                Text('Kata Kunci Masalah: ${item.katakunci}'),
+
+                item.katakunci2 == null
+                ? Text('Kata Kunci Masalah: ${item.katakunci}')
+                : Text('Kata Kunci Masalah: ${item.katakunci}, ${item.katakunci2}'),
+                
                 Text('Sesi Pendampingan: ${item.sesi}'),
                 const SizedBox(height: 16.0),
                 Text('Nama Pendamping Sebaya: ${item.psname}'),
@@ -96,15 +101,6 @@ class _DampinganListState extends State<DampinganList> {
           ),
           actions: <Widget>[
             TextButton(
-              style: ButtonStyle(
-                foregroundColor: MaterialStateProperty.all<Color>(const Color.fromARGB(255, 248, 146, 139)),
-              ),
-              child: const Text('Tutup'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
               child: const Text('Jadwalkan Pendampingan'),
               onPressed: () async {
 //                print(item.reqid);
@@ -134,6 +130,15 @@ class _DampinganListState extends State<DampinganList> {
 //                  selectedDate = null;
 //                  print('SelectedDate erase: $selectedDate');
                   }*/
+              },
+            ),
+            TextButton(
+              style: ButtonStyle(
+                foregroundColor: MaterialStateProperty.all<Color>(Colors.red),
+              ),
+              child: const Text('Tutup'),
+              onPressed: () {
+                Navigator.of(context).pop();
               },
             ),
           ],
@@ -168,7 +173,7 @@ class _DampinganListState extends State<DampinganList> {
                       child: 
                         ListTile(
                           title: Text('ID Dampingan: ${item.reqid.toString()} - ${item.initial}'),
-                          subtitle: /*const Text(''),*/ Text('Kontak Dampingan: ${item.kontak}\nKata Kunci Masalah: ${item.katakunci}'),
+                          subtitle: /*const Text(''),*/ Text('Kontak Dampingan: ${item.kontak}'),
                           onTap: () {
                             _showDetailsDialog(item);
                           },
