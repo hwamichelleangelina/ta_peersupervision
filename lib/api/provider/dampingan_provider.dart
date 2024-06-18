@@ -9,7 +9,7 @@ import 'package:ta_peersupervision/api/logic/psusers_logic.dart';
 import 'package:ta_peersupervision/api/repository/psusers_repository.dart';
 
 class DampinganProvider with ChangeNotifier {
-  final String serverUrl = 'http://localhost:3000/dampingan';
+  final String serverUrl = 'http://34.34.222.113:8080/dampingan';
 
   List<dynamic> _dampinganList = [];
   List<dynamic> _noPSdampinganList = [];
@@ -70,7 +70,7 @@ class DampinganProvider with ChangeNotifier {
   }
 
   Future<bool> checkPertemuan(int reqid) async {
-    final response = await http.get(Uri.parse('http://localhost:3000/dampingan/countPendampingan/$reqid/'));
+    final response = await http.get(Uri.parse('http://34.34.222.113:8080/dampingan/countPendampingan/$reqid/'));
 
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
@@ -81,7 +81,7 @@ class DampinganProvider with ChangeNotifier {
   }
 
   Future<void> updateDampingan(int reqid, Map<String, dynamic> newData) async {
-    final url = 'http://localhost:3000/dampingan/updateDampingan/$reqid';
+    final url = 'http://34.34.222.113:8080/dampingan/updateDampingan/$reqid';
     try {
       final response = await http.put(
         Uri.parse(url),
