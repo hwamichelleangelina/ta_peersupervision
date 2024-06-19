@@ -10,7 +10,7 @@ import 'package:ta_peersupervision/api/repository/event.dart';
 import 'package:ta_peersupervision/api/shared_preferences/psusers_data_manager.dart';
 
 class JadwalRepository {
-  String serverUrl = 'http://34.128.89.90:8080/jadwal';
+  String serverUrl = 'https://34.128.89.90:8080/jadwal';
 
   Future<void> createJadwal({required Jadwal jadwal}) async {
     final response = await http.post(

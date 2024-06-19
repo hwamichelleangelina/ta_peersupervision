@@ -6,7 +6,7 @@ import 'package:ta_peersupervision/api/shared_preferences/jadwal_data_manager.da
 import 'package:ta_peersupervision/api/shared_preferences/psusers_data_manager.dart';
 
 class LaporanProvider with ChangeNotifier {
-  final String serverUrl = 'http://34.128.89.90:8080/laporan';
+  final String serverUrl = 'https://34.128.89.90:8080/laporan';
 
   LaporanProvider() {
     fetchJadwalReport();
@@ -24,7 +24,7 @@ Future<List<JadwalList>> fetchJadwalReport() async {
       throw Exception('No logged in user');
     }
 
-    final response = await http.get(Uri.parse('http://34.128.89.90:8080/laporan/getJadwal/$psnim'));
+    final response = await http.get(Uri.parse('https://34.128.89.90:8080/laporan/getJadwal/$psnim'));
 
     if (response.statusCode == 200) {
       final body = jsonDecode(response.body);
@@ -59,7 +59,7 @@ Future<List<JadwalList>> fetchJadwalReport() async {
   bool get checkLaporan => _checkLaporan;
 
   Future<bool> fetchCheckLaporan(int jadwalid) async {
-    final response = await http.get(Uri.parse('http://34.128.89.90:8080/laporan/isLaporanFilled/$jadwalid/'));
+    final response = await http.get(Uri.parse('https://34.128.89.90:8080/laporan/isLaporanFilled/$jadwalid/'));
 
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
