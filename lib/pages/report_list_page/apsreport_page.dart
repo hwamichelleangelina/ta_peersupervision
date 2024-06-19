@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously, avoid_print
+// ignore_for_file: avoid_print, use_build_context_synchronously
 
 import 'dart:convert';
 
@@ -135,10 +135,8 @@ class _APSReportPageState extends State<APSReportPage> {
                           } else if (checkSnapshot.hasError) {
                             return Text("${checkSnapshot.error}"); // Menampilkan pesan error jika terjadi kesalahan
                           } else {
-                            return ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: _filteredJadwalList.length,
-                              itemBuilder: (context, index) {
+                            return Column(
+                              children: List.generate(_filteredJadwalList.length, (index) {
                                 final bool checkLaporan = checkSnapshot.data![index]; // Mengambil nilai checkLaporan dari list hasil Future
                                 if (checkLaporan == false) {
                                   return APSReportTable(
@@ -154,7 +152,7 @@ class _APSReportPageState extends State<APSReportPage> {
                                     onTap: () => _showDetails(_filteredJadwalList[index]),
                                   );                                  
                                 }
-                              },
+                              }),
                             );
                           }
                         },

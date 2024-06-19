@@ -62,7 +62,7 @@ class _PSReportPageState extends State<PSReportPage> {
   }
 
   void _navigateToForm(JadwalList jadwal) {
-    Get.to (() => PSReportForm(jadwal: jadwal));
+    Get.to(() => PSReportForm(jadwal: jadwal));
   }
 
   @override
@@ -112,15 +112,15 @@ class _PSReportPageState extends State<PSReportPage> {
                   child: TextField(
                     controller: _controller,
                     decoration: const InputDecoration(
-                    contentPadding: EdgeInsets.symmetric(horizontal: 50, vertical: 10),
-                    labelText: 'Pencarian',
-                    prefixIcon: Icon(Icons.search),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 50, vertical: 10),
+                      labelText: 'Pencarian',
+                      prefixIcon: Icon(Icons.search),
                     ),
                     onChanged: (query) => _filterJadwal(query),
                   ),
                 ),
                 const SizedBox(height: 30),
-                
+
                 FutureBuilder<List<JadwalList>>(
                   future: futureJadwal,
                   builder: (context, snapshot) {
@@ -134,10 +134,8 @@ class _PSReportPageState extends State<PSReportPage> {
                           } else if (checkSnapshot.hasError) {
                             return Text("${checkSnapshot.error}"); // Menampilkan pesan error jika terjadi kesalahan
                           } else {
-                            return ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: _filteredJadwalList.length,
-                              itemBuilder: (context, index) {
+                            return Column(
+                              children: List.generate(_filteredJadwalList.length, (index) {
                                 final bool checkLaporan = checkSnapshot.data![index]; // Mengambil nilai checkLaporan dari list hasil Future
                                 if (checkLaporan == false) {
                                   return PSReportsTable(
@@ -145,15 +143,14 @@ class _PSReportPageState extends State<PSReportPage> {
                                     jadwal: _filteredJadwalList[index],
                                     onTap: () => _navigateToForm(_filteredJadwalList[index]),
                                   );
-                                }
-                                else {
+                                } else {
                                   return PSReportsTable(
                                     checkLaporan: checkLaporan,
                                     jadwal: _filteredJadwalList[index],
                                     onTap: () => _showDetails(_filteredJadwalList[index]),
-                                  );                                  
+                                  );
                                 }
-                              },
+                              }),
                             );
                           }
                         },
