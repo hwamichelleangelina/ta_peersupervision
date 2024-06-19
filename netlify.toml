@@ -1,6 +1,6 @@
 [build]
+  command = "./build.sh"
   publish = "build/web"
-  command = "flutter build web"
 
 [[redirects]]
   from = "/*"
