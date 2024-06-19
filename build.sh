@@ -1,6 +1,12 @@
 #!/bin/bash
 
-#!/bin/bash
+# Enable error reporting and command display
+set -e
+set -x
+
+# Print the current working directory and its contents
+pwd
+ls -la
 
 # Install Flutter
 wget https://storage.googleapis.com/flutter_infra/releases/stable/linux/flutter_linux_2.10.4-stable.tar.xz
