@@ -9,8 +9,9 @@ pwd
 ls -la
 
 # Install Flutter
-wget https://storage.googleapis.com/flutter_infra/releases/stable/linux/flutter_linux_2.10.4-stable.tar.xz
-tar xf flutter_linux_2.10.4-stable.tar.xz
+FLUTTER_VERSION="3.7.0"
+wget https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_${FLUTTER_VERSION}-stable.tar.xz
+tar xf flutter_linux_${FLUTTER_VERSION}-stable.tar.xz
 export PATH="$PATH:`pwd`/flutter/bin"
 
 # Check Flutter version
