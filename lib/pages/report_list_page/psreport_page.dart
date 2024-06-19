@@ -184,7 +184,7 @@ class _PSReportPageState extends State<PSReportPage> {
     int? jadwalId = jadwal.jadwalid;
 
     try {
-      final response = await http.get(Uri.parse('http://34.34.222.113:8080/laporan/getLaporan/$jadwalId'));
+      final response = await http.get(Uri.parse('http://34.128.89.90:8080/laporan/getLaporan/$jadwalId'));
       if (response.statusCode == 200) {
         final detail = json.decode(response.body);
         if (detail['report'] is List && detail['report'].isNotEmpty) {

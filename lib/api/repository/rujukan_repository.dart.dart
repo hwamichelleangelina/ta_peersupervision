@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:ta_peersupervision/api/logic/rujukan_logic.dart';
 
 class RujukanRepository {
-  final String serverUrl = 'http://34.34.222.113:8080/rujukan';
+  final String serverUrl = 'http://34.128.89.90:8080/rujukan';
 
   Future<void> createRujukan({required int reqid}) async {
     final response = await http.post(

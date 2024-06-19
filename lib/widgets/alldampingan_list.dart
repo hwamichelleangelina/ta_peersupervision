@@ -69,7 +69,7 @@ class _AllDampinganListState extends State<AllDampinganList> {
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.yellow, // Warna hijau pada tombol
                   ),
-                  child: const Text('Dampingan tanpa PS', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
+                  child: const Text('Permintaan Melalui Google Form', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
                 ),
                 const SizedBox(height: 10.0),
                 ElevatedButton(
@@ -80,7 +80,7 @@ class _AllDampinganListState extends State<AllDampinganList> {
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.green, // Warna hijau pada tombol
                   ),
-                  child: const Text('Tambah Dampingan Baru', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
+                  child: const Text('Tambah Dampingan Baru Manual', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
                 ),
               ]
             ),

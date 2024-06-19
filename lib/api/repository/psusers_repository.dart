@@ -8,7 +8,7 @@ import 'package:ta_peersupervision/api/logic/psusers_logic.dart';
 import 'package:ta_peersupervision/api/shared_preferences/psusers_data_manager.dart';
 
 class PSUsersRepository {
-  final String serverUrl = 'http://34.34.222.113:8080/psusers';
+  final String serverUrl = 'http://34.128.89.90:8080/psusers';
 
 // Dilakukan oleh BK ITB
   Future<void> registerPSUsers({required PSUsers psusers}) async {
