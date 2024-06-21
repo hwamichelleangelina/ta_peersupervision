@@ -21,7 +21,7 @@ class Footer extends StatelessWidget {
           width: double.maxFinite,
           alignment: Alignment.center,
           child: const Text(
-            "Oleh 18320007 untuk EB4291 Tugas Akhir II",
+            "Oleh 18320007 untuk EB4291 Tugas Akhir II        Version 2.3",
             style: TextStyle(
               fontFamily: 'Montserrat',
               fontWeight: FontWeight.w400,
