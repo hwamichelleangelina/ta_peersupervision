@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, avoid_print
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -6,6 +6,7 @@ import 'package:ta_peersupervision/api/logic/dampingan_logic.dart';
 import 'package:ta_peersupervision/api/logic/psusers_logic.dart';
 import 'package:ta_peersupervision/api/repository/dampingan_repository.dart';
 import 'package:ta_peersupervision/api/repository/psusers_repository.dart';
+import 'package:ta_peersupervision/dummy/usedatanananggota_database.dart';
 
 class DataTableAnggotaNonAktif extends StatefulWidget {
   final Function(String, String, String, bool, bool) onSubmit;
@@ -299,6 +300,26 @@ class _DataTableAnggotaNonAktifState extends State<DataTableAnggotaNonAktif> {
       );
     }
 
+  Future<void> _fetchNAUsers() async {
+    try {
+      // Mengambil data anggota aktif dari repository
+      List<NonActiveUser> activeUsers = await repository.fetchNAUsers();
+      
+      // Update tampilan jika perlu
+      setState(() {
+        // Mengisi data dari hasil pengambilan data
+        dataNADatabase = activeUsers.map((user) => {
+          'role': user.role,
+          'name': user.name,
+          'nim': user.nanim.toString(),
+        }).toList();
+      });
+    } catch (error) {
+      // Penanganan kesalahan jika diperlukan
+      print('Error fetching non active users: $error');
+    }
+  }
+
   void _showActivateDialog(BuildContext context, String name, String nim) {
     showDialog(
       context: context,
@@ -320,7 +341,7 @@ class _DataTableAnggotaNonAktifState extends State<DataTableAnggotaNonAktif> {
               await repository.activate(activate: activate);
 
               // Setelah proses nonaktif selesai, perbarui daftar anggota aktif
-              await repository.fetchNAUsers();
+              await _fetchNAUsers();
               //await _fetchNActiveUsers();
 
               Navigator.of(context).pop();
