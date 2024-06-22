@@ -362,7 +362,7 @@ class _DataTableAnggotaState extends State<DataTableAnggota> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Status Anggota akan Tidak Aktif'),
-          content: Text('Anda akan menon-aktifkan $name. Aksi ini tidak dapat dibatalkan'),
+          content: Text('Anda akan menon-aktifkan $name'),
           actions: <Widget>[
             TextButton(
               onPressed: () async {

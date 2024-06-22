@@ -119,6 +119,32 @@ class PSUsersRepository {
     return null;
   }
 
+  Future<void> activate({required Activate activate}) async {
+    final response = await http.put(Uri.parse('$serverUrl/activateUsers'), headers:{
+      'Content-Type': 'application/json',
+    },
+      body: jsonEncode({
+        'psnim' : activate.psnim,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+    }
+    else if (response.statusCode == 500) {
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
+      final String message = responseData["message"];
+      Get.snackbar("Activate PS User", message,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,);
+    }
+    else {
+      Get.snackbar("Activate PS User", "Failed to activate PS User",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,);
+      Get.toNamed('/bk-anggota-ps');
+    }
+  }
+
   Future<void> nonActivate({required NonActivate nonactivate}) async {
     final response = await http.put(Uri.parse('$serverUrl/nonActivateUsers'), headers:{
       'Content-Type': 'application/json',

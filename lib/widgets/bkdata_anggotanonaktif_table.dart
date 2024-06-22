@@ -1,4 +1,7 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:ta_peersupervision/api/logic/dampingan_logic.dart';
 import 'package:ta_peersupervision/api/logic/psusers_logic.dart';
 import 'package:ta_peersupervision/api/repository/dampingan_repository.dart';
@@ -215,11 +218,22 @@ class _DataTableAnggotaNonAktifState extends State<DataTableAnggotaNonAktif> {
           DataCell(Text(_getFrequency(freqData, users[index].nanim.toString()).toString())),
           DataCell(Text(_getDampinganCount(dampinganData, users[index].nanim.toString()).toString())),
           DataCell(
-            ElevatedButton(
-              onPressed: () {
-                _showDetailsDialog(context, users[index].name, users[index].nanimAsString);
-              },
-              child: const Text('Detail'),
+            Row(
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    _showDetailsDialog(context, users[index].name, users[index].nanimAsString);
+                  },
+                  child: const Text('Detail'),
+                ),
+                const SizedBox(width: 8.0),
+                ElevatedButton(
+                  onPressed: () {
+                    _showActivateDialog(context, users[index].name, users[index].nanimAsString);
+                  },
+                  child: const Text('O', style: TextStyle(color: Colors.green)),
+                ),
+              ],
             ),
           ),
         ],
@@ -284,6 +298,42 @@ class _DataTableAnggotaNonAktifState extends State<DataTableAnggotaNonAktif> {
         },
       );
     }
+
+  void _showActivateDialog(BuildContext context, String name, String nim) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Status Anggota akan Diaktifkan Kembali'),
+          content: Text('Anda akan mengaktifkan $name kembali'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Batal'),
+            ),
+            TextButton(
+              onPressed: () async {
+              Activate activate = Activate(psnim: int.tryParse(nim) ?? 0);
+              // Implementasi logika menon-aktifkan anggota
+              await repository.activate(activate: activate);
+
+              // Setelah proses nonaktif selesai, perbarui daftar anggota aktif
+              await repository.fetchNAUsers();
+              //await _fetchNActiveUsers();
+
+              Navigator.of(context).pop();
+              Get.snackbar('Status Anggota Pendamping Sebaya ITB', '$name telah diaktifkan kembali',
+                backgroundColor: Colors.green, colorText: Colors.white);
+              },
+              child: const Text('Aktifkan'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   // Fungsi untuk menghitung frekuensi kemunculan nama dalam dataFromDatabase
   int _getFrequency(List<FreqPS> freqData, String nim) {
