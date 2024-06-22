@@ -372,9 +372,9 @@ class _DataTableAnggotaNonAktifState extends State<DataTableAnggotaNonAktif> {
                 await _fetchNAUsers();
                 Navigator.of(context).pop();
                 Get.snackbar('Status Anggota Pendamping Sebaya ITB', '$name telah dihapus',
-                  backgroundColor: Colors.red, colorText: Colors.white);
+                  backgroundColor: Colors.green, colorText: Colors.white);
               },
-              child: const Text('Hapus'),
+              child: const Text('Hapus', style: TextStyle(color: Colors.red),),
             ),
             const SizedBox(width: 10,),
             TextButton(
