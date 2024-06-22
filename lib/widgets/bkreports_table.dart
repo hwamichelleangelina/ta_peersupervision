@@ -302,11 +302,8 @@ class _DataTableWithDownloadButtonState extends State<DataTableWithDownloadButto
           content: Text('Anda akan mendownload file untuk $name - ID Jadwal: $jadwalid.'),
           actions: <Widget>[
             TextButton(
-              onPressed: () async {
-                await _downloadFile(jadwalid);
+              onPressed: () {
                 Navigator.of(context).pop();
-                Get.snackbar('Pengunduhan Dokumen Laporan Proses Pendampingan', 'Laporan Proses Pendampingan dengan ID Jadwal: $jadwalid berhasil diunduh',
-                  backgroundColor: Colors.green, colorText: Colors.white);
               },
               style: ButtonStyle(
                 foregroundColor: MaterialStateProperty.all<Color>(Colors.red),
@@ -315,8 +312,11 @@ class _DataTableWithDownloadButtonState extends State<DataTableWithDownloadButto
             ),
             const SizedBox(width: 10,),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
+                await _downloadFile(jadwalid);
                 Navigator.of(context).pop();
+                Get.snackbar('Pengunduhan Dokumen Laporan Proses Pendampingan', 'Laporan Proses Pendampingan dengan ID Jadwal: $jadwalid berhasil diunduh',
+                  backgroundColor: Colors.green, colorText: Colors.white);
               },
               child: const Text('Unduh'),
             ),
