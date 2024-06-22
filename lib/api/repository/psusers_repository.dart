@@ -88,10 +88,6 @@ class PSUsersRepository {
     );
 
     if (response.statusCode == 200) {
-      Get.snackbar('Delete PS User', 'User deleted successfully',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
     } else if (response.statusCode == 500) {
       final Map<String, dynamic> responseData = jsonDecode(response.body);
       final String message = responseData["message"];
