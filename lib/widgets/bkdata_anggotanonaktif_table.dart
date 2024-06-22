@@ -14,7 +14,6 @@ class DataTableAnggotaNonAktif extends StatefulWidget {
   const DataTableAnggotaNonAktif({super.key, required this.onSubmit});
 
   @override
-  // ignore: library_private_types_in_public_api
   _DataTableAnggotaNonAktifState createState() => _DataTableAnggotaNonAktifState();
 }
 
@@ -182,7 +181,7 @@ class _DataTableAnggotaNonAktifState extends State<DataTableAnggotaNonAktif> {
                         DataColumn(
                           label: Container(
                             alignment: Alignment.center,
-                            child: const Text('Keterangan',
+                            child: const Text('Aksi',
                               textAlign: TextAlign.center,
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
@@ -221,6 +220,16 @@ class _DataTableAnggotaNonAktifState extends State<DataTableAnggotaNonAktif> {
           DataCell(
             Row(
               children: [
+                ElevatedButton(
+                  onPressed: () {
+                    _showDeleteDialog(context, users[index].name, users[index].nanim);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.red,
+                  ),
+                  child: const Icon(Icons.delete),
+                ),
+                const SizedBox(width: 8.0),
                 ElevatedButton(
                   onPressed: () {
                     _showDetailsDialog(context, users[index].name, users[index].nanimAsString);
@@ -307,7 +316,6 @@ class _DataTableAnggotaNonAktifState extends State<DataTableAnggotaNonAktif> {
       
       // Update tampilan jika perlu
       setState(() {
-        // Mengisi data dari hasil pengambilan data
         dataNADatabase = activeUsers.map((user) => {
           'role': user.role,
           'name': user.name,
@@ -315,7 +323,6 @@ class _DataTableAnggotaNonAktifState extends State<DataTableAnggotaNonAktif> {
         }).toList();
       });
     } catch (error) {
-      // Penanganan kesalahan jika diperlukan
       print('Error fetching non active users: $error');
     }
   }
@@ -337,13 +344,8 @@ class _DataTableAnggotaNonAktifState extends State<DataTableAnggotaNonAktif> {
             TextButton(
               onPressed: () async {
               Activate activate = Activate(psnim: int.tryParse(nim) ?? 0);
-              // Implementasi logika menon-aktifkan anggota
               await repository.activate(activate: activate);
-
-              // Setelah proses nonaktif selesai, perbarui daftar anggota aktif
               await _fetchNAUsers();
-              //await _fetchNActiveUsers();
-
               Navigator.of(context).pop();
               Get.snackbar('Status Anggota Pendamping Sebaya ITB', '$name telah diaktifkan kembali',
                 backgroundColor: Colors.green, colorText: Colors.white);
@@ -356,7 +358,45 @@ class _DataTableAnggotaNonAktifState extends State<DataTableAnggotaNonAktif> {
     );
   }
 
-  // Fungsi untuk menghitung frekuensi kemunculan nama dalam dataFromDatabase
+  void _showDeleteDialog(BuildContext context, String name, int nim) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Hapus Anggota'),
+          content: Text('Anda yakin ingin menghapus $name?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () async {
+                await _deletePSUser(nim);
+                await _fetchNAUsers();
+                Navigator.of(context).pop();
+                Get.snackbar('Status Anggota Pendamping Sebaya ITB', '$name telah dihapus',
+                  backgroundColor: Colors.red, colorText: Colors.white);
+              },
+              child: const Text('Hapus'),
+            ),
+            const SizedBox(width: 10,),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Batal'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _deletePSUser(int nim) async {
+    try {
+      await repository.deletePSUser(psnim: nim);
+    } catch (error) {
+      print('Error deleting user: $error');
+    }
+  }
+
   int _getFrequency(List<FreqPS> freqData, String nim) {
     final freq = freqData.firstWhere(
       (f) => f.psnim.toString() == nim,
@@ -372,5 +412,4 @@ class _DataTableAnggotaNonAktifState extends State<DataTableAnggotaNonAktif> {
     );
     return count.count!;
   }
-
 }

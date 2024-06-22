@@ -217,7 +217,10 @@ class _DataTableAnggotaState extends State<DataTableAnggota> {
                   onPressed: () {
                     _showEditDialog(context, users[index].name, users[index].nimAsString);
                   },
-                  child: const Text('Edit'),
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.blue,
+                  ),
+                  child: const Icon(Icons.edit),
                 ),
                 const SizedBox(width: 8.0),
                 ElevatedButton(
