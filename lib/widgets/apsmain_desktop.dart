@@ -73,7 +73,7 @@ class _APSMainDesktopState extends State<APSMainDesktop> {
                     Get.toNamed('/aps-dampingan');
                   },
                   child: const Text(
-                    "Cek Dampingan Saya Hari ini",
+                    "Cek Daftar Dampingan Saya",
                     style: TextStyle(
                       fontWeight: FontWeight.w900,
                       fontSize: 20,

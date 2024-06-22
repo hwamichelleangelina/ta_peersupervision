@@ -125,7 +125,7 @@ class _BKJadwalPageState extends State<BKJadwalPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Expanded(
-                            child: Text('Nomor Jadwal: ${event.jadwalid}\n${event.initial} - ID Dampingan: ${event.reqid}\nPendamping Sebaya: ${event.psname}\nMedia Pendampingan: ${event.mediapendampingan}\n'),
+                            child: Text('Nomor Jadwal: ${event.jadwalid}\n${event.initial} - ID Dampingan: ${event.reqid}\nPendamping Sebaya: ${event.psname}\nTempat Pendampingan: ${event.mediapendampingan}\n'),
                           ),
                         ],
                       );
@@ -139,7 +139,7 @@ class _BKJadwalPageState extends State<BKJadwalPage> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Tutup', style: TextStyle(color: Colors.red)),
+              child: const Text('Tutup'),
             ),
           ],
         );

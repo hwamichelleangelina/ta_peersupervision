@@ -130,7 +130,7 @@ class _APSJadwalPageState extends State<APSJadwalPage> {
                 ),
                 TextField(
                   controller: mediaController,
-                  decoration: const InputDecoration(labelText: 'Media Pendampingan'),
+                  decoration: const InputDecoration(labelText: 'Tempat Pendampingan'),
                 ),
                 const SizedBox(height: 16),
                 const Text('Pendampingan Hari Ini:', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -145,7 +145,7 @@ class _APSJadwalPageState extends State<APSJadwalPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Expanded(
-                            child: Text('${event.initial}\nID Dampingan: ${event.reqid}\nMedia Pendampingan: ${event.mediapendampingan}\n'),
+                            child: Text('${event.initial}\nID Dampingan: ${event.reqid}\nTempat Pendampingan: ${event.mediapendampingan}\n'),
                           ),
                           IconButton(
                             icon: const Icon(Icons.delete),
@@ -202,7 +202,7 @@ class _APSJadwalPageState extends State<APSJadwalPage> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Tutup', style: TextStyle(color: Colors.red)),
+              child: const Text('Tutup'),
             ),
           ],
         );
@@ -220,15 +220,16 @@ class _APSJadwalPageState extends State<APSJadwalPage> {
           content: Text('Apakah Anda yakin ingin menghapus jadwal pendampingan dengan ID: $jadwalid?'),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Batal'),
-            ),
-            TextButton(
               onPressed: () => Navigator.of(context).pop(true),
               style: ButtonStyle(
                 foregroundColor: MaterialStateProperty.all<Color>(Colors.red),
               ),
               child: const Text('Hapus'),
+            ),
+            const SizedBox(width: 10,),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Batal'),
             ),
           ],
         );

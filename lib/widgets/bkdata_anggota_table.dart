@@ -378,15 +378,16 @@ class _DataTableAnggotaState extends State<DataTableAnggota> {
               Get.snackbar('Status Anggota Pendamping Sebaya ITB', '$name telah dinon-aktifkan',
                 backgroundColor: Colors.green, colorText: Colors.white);
               },
+              style: ButtonStyle(
+                foregroundColor: MaterialStateProperty.all<Color>(Colors.red),
+              ),
               child: const Text('Non-Aktifkan'),
             ),
+            const SizedBox(width: 10,),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              style: ButtonStyle(
-                foregroundColor: MaterialStateProperty.all<Color>(Colors.red),
-              ),
               child: const Text('Batal'),
             ),
           ],

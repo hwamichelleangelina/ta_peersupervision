@@ -176,7 +176,7 @@ class _APSReportPageState extends State<APSReportPage> {
 
   String formattedTanggal(String tanggalString) {
     final DateTime dateTime = DateTime.parse(tanggalString);
-    return DateFormat('d MMMM y').format(dateTime);
+    return DateFormat('d MMMM y', 'id').format(dateTime);
   }
 
   void _showDetails(JadwalList jadwal) async {

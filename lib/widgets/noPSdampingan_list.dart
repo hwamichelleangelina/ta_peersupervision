@@ -163,15 +163,16 @@ class _NoPSDampinganListState extends State<NoPSDampinganList> {
           content: Text('Apakah Anda yakin ingin menghapus dampingan dengan ID $reqid?'),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Batal'),
-            ),
-            TextButton(
               onPressed: () => Navigator.of(context).pop(true),
               style: ButtonStyle(
                 foregroundColor: MaterialStateProperty.all<Color>(Colors.red),
               ),
               child: const Text('Hapus'),
+            ),
+            const SizedBox(width: 10,),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Batal'),
             ),
           ],
         );

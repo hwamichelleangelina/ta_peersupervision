@@ -33,7 +33,7 @@ class _DataTableWithDownloadButtonState extends State<DataTableWithDownloadButto
 
   String formattedTanggal(String tanggalString) {
     final DateTime dateTime = DateTime.parse(tanggalString);
-    return DateFormat('d MMMM y').format(dateTime);
+    return DateFormat('d MMMM y', 'id').format(dateTime);
   }
 
   Future<void> _fetchData() async {
@@ -308,16 +308,17 @@ class _DataTableWithDownloadButtonState extends State<DataTableWithDownloadButto
                 Get.snackbar('Pengunduhan Dokumen Laporan Proses Pendampingan', 'Laporan Proses Pendampingan dengan ID Jadwal: $jadwalid berhasil diunduh',
                   backgroundColor: Colors.green, colorText: Colors.white);
               },
-              child: const Text('Download'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
               style: ButtonStyle(
                 foregroundColor: MaterialStateProperty.all<Color>(Colors.red),
               ),
               child: const Text('Batal'),
+            ),
+            const SizedBox(width: 10,),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Unduh'),
             ),
           ],
         );

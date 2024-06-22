@@ -82,9 +82,6 @@ class _UbahPSPasswordState extends State<UbahPSPassword> {
           onPressed: () {
             Navigator.of(context).pop();
           },
-          style: ButtonStyle(
-            foregroundColor: MaterialStateProperty.all<Color>(Colors.red),
-          ),
           child: const Text('Batal'),
         ),
       ],

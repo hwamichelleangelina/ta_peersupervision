@@ -30,7 +30,7 @@ class _PSDampinganListState extends State<PSDampinganList> {
     if (date == null) {
       return 'N/A';
     }
-    final DateFormat formatter = DateFormat('d MMMM y');
+    final DateFormat formatter = DateFormat('d MMMM y', 'id');
     return formatter.format(date);
   }
 
@@ -75,7 +75,7 @@ class _PSDampinganListState extends State<PSDampinganList> {
             ),
           ),
           actions: <Widget>[
-            TextButton(
+            ElevatedButton(
               child: const Text('Jadwalkan Pendampingan'),
               onPressed: () async {
                 ReqidStorage.setReqid(item.reqid!);
@@ -83,9 +83,6 @@ class _PSDampinganListState extends State<PSDampinganList> {
               },
             ),
             TextButton(
-              style: ButtonStyle(
-                foregroundColor: MaterialStateProperty.all<Color>(Colors.red),
-              ),
               child: const Text('Tutup'),
               onPressed: () {
                 Navigator.of(context).pop();
