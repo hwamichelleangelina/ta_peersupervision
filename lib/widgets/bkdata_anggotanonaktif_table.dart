@@ -142,7 +142,7 @@ class _DataTableAnggotaNonAktifState extends State<DataTableAnggotaNonAktif> {
                         DataColumn(
                           label: Container(
                             alignment: Alignment.center,
-                            child: const Text('Tahun Mulai Aktif',
+                            child: const Text('Tahun Aktif',
                               textAlign: TextAlign.center,
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
