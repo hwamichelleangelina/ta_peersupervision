@@ -16,27 +16,8 @@ import 'package:ta_peersupervision/widgets/bkheader_mobile.dart';
 
 import 'package:provider/provider.dart';
 
-// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
-
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:get/get.dart';
-import 'package:intl/intl.dart';
-import 'package:ta_peersupervision/api/logic/jadwal_logic.dart';
-import 'package:ta_peersupervision/api/repository/event.dart';
-import 'package:ta_peersupervision/api/repository/jadwal_repository.dart';
-import 'package:ta_peersupervision/api/shared_preferences/jadwal_data_manager.dart';
-import 'package:ta_peersupervision/constants/colors.dart';
-import 'package:ta_peersupervision/constants/size.dart';
-import 'package:ta_peersupervision/widgets/apsdrawer_mobile.dart';
-import 'package:ta_peersupervision/widgets/apsheader_kembalihome.dart';
-import 'package:ta_peersupervision/widgets/calendar_widget.dart';
-import 'package:ta_peersupervision/widgets/footer.dart';
-import 'package:ta_peersupervision/widgets/apsheader_mobile.dart';
-
 class BKJadwalPage extends StatefulWidget {
-  final int psnim;
-  const BKJadwalPage({super.key, required this.psnim});
+  const BKJadwalPage({super.key});
 
   @override
   _BKJadwalPageState createState() => _BKJadwalPageState();
@@ -48,10 +29,6 @@ class _BKJadwalPageState extends State<BKJadwalPage> {
   final List<GlobalKey> navbarKeys = List.generate(4, (index) => GlobalKey());
 
   Map<DateTime, List<MyJadwal>> jadwal = {};
-
-  TextEditingController mediaController = TextEditingController();
-  TextEditingController reqidController = TextEditingController();
-
   JadwalRepository repository = JadwalRepository();
 
   String formatDateSQL(DateTime date) {
@@ -62,73 +39,76 @@ class _BKJadwalPageState extends State<BKJadwalPage> {
   @override
   void initState() {
     super.initState();
-    _fetchEvents(widget.psnim);
-    reqidController.text = ReqidStorage.getReqid().toString();
+    _fetchEvents();
   }
 
-  Future<void> _fetchEvents(int psnim) async {
+  Future<void> _fetchEvents() async {
     try {
-      Map<DateTime, List<MyJadwal>> fetchedEvents = await repository.fetchJadwal(widget.psnim);
+      Map<DateTime, List<MyJadwal>> fetchedEvents = await repository.fetchAllJadwal();
       setState(() {
         jadwal = fetchedEvents;
       });
     } catch (e) {
-      // print('Failed to fetch events: $e');
+      //print('Failed to fetch events: $e');
       Get.snackbar('Jadwal Pendampingan', 'Belum ada Jadwal');
     }
   }
 
   @override
   void dispose() {
-    reqidController.dispose();
-    mediaController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Scaffold(
-          key: scaffoldKey,
-          backgroundColor: CustomColor.purpleBg,
-          endDrawer: constraints.maxWidth >= minDesktopWidth ? null : const APSDrawerMobile(),
-          body: SingleChildScrollView(
-            controller: scrollController,
-            scrollDirection: Axis.vertical,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (constraints.maxWidth >= minDesktopWidth)
-                  HeaderAPSBack(onNavMenuTap: (int navIndex) {
-                    scrollToSection(navIndex);
-                  })
-                else
-                  APSHeaderMobile(
-                    onLogoTap: () {},
-                    onMenuTap: () {
-                      scaffoldKey.currentState?.openEndDrawer();
-                    },
+    return ChangeNotifierProvider(
+      create: (context) => LaporanProvider(),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Scaffold(
+            key: scaffoldKey,
+            backgroundColor: CustomColor.purpleBg,
+            endDrawer: constraints.maxWidth >= minDesktopWidth
+                ? null
+                : const BKDrawerMobile(),
+            body: SingleChildScrollView(
+              controller: scrollController,
+              scrollDirection: Axis.vertical,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (constraints.maxWidth >= minDesktopWidth)
+                    HeaderBKKembali(
+                      onNavMenuTap: (int navIndex) {
+                        scrollToSection(navIndex);
+                      },
+                      navi: '/bk-home',
+                    )
+                  else
+                    BKHeaderMobile(
+                      onLogoTap: () {},
+                      onMenuTap: () {
+                        scaffoldKey.currentState?.openEndDrawer();
+                      },
+                    ),
+                  const SizedBox(height: 30),
+                  CalendarWidget(
+                    onDaySelected: _showEventDialog,
+                    jadwal: jadwal,
+                    initialFocusedDay: DateTime.now(),
                   ),
-                const SizedBox(height: 30),
-                CalendarWidget(
-                  onDaySelected: _showEventDialog,
-                  jadwal: jadwal,
-                  initialFocusedDay: DateTime.now(),
-                ),
-                const SizedBox(height: 30),
-                const Footer(),
-              ],
+                  const SizedBox(height: 30),
+                  const Footer(),
+                ],
+              ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 
   void _showEventDialog(DateTime date, List<MyJadwal> events) {
-    DateTime selectedDate = DateTime(date.year, date.month, date.day);
-
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -142,53 +122,35 @@ class _BKJadwalPageState extends State<BKJadwalPage> {
                 const Text('Pendampingan Hari Ini:', style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 if (events.isEmpty)
-                  const Text('Tidak ada pendampingan di hari ini', style: TextStyle(color: Color.fromARGB(255, 227, 152, 147)))
+                  const Text('Tidak ada pendampingan di hari ini')
                 else
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: events.map((event) {
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: RichText(
-                              text: TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: '${event.initial}\nID Dampingan: ${event.reqid}\nTempat Pendampingan: ${event.mediapendampingan}\n',
-                                    style: const TextStyle(color: Colors.white),
+                      return FutureBuilder<bool>(
+                        future: Provider.of<LaporanProvider>(context, listen: false).fetchCheckLaporan(event.jadwalid),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const CircularProgressIndicator();
+                          } else if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          } else {
+                            bool isReported = snapshot.data ?? false;
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    'Nomor Jadwal: ${event.jadwalid}\n${event.initial} - ID Dampingan: ${event.reqid}\nPendamping Sebaya: ${event.psname}\nTempat Pendampingan: ${event.mediapendampingan}\n',
                                   ),
-                                  if (event.laporan == null || event.laporan.isEmpty) ...[
-                                    const TextSpan(
-                                      text: 'Laporan belum ada\n',
-                                      style: TextStyle(color: Colors.red),
-                                    ),
-                                  ],
-                                ],
-                              ),
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: () async {
-                              final confirmDelete = await _showDeleteConfirmationDialog(context, event.jadwalid);
-                              if (confirmDelete) {
-                                // Menghapus event dari map terlebih dahulu
-                                setState(() {
-                                  jadwal[selectedDate]?.remove(event);
-                                  if (jadwal[selectedDate]?.isEmpty ?? false) {
-                                    jadwal.remove(selectedDate);
-                                  }
-                                });
-                                // Menghapus event dari repository
-                                await repository.deleteJadwal(event.jadwalid);
-                                // Mengambil ulang data dari repository
-                                await _fetchEvents(widget.psnim);
-                                Navigator.of(context).pop();
-                              }
-                            },
-                          ),
-                        ],
+                                ),
+                                isReported
+                                ? const Text("")
+                                : const Text("Laporan Belum ada", style: TextStyle(color: Colors.red)),
+                              ],
+                            );
+                          }
+                        },
                       );
                     }).toList(),
                   ),
@@ -206,32 +168,6 @@ class _BKJadwalPageState extends State<BKJadwalPage> {
         );
       },
     );
-  }
-
-  Future<bool> _showDeleteConfirmationDialog(BuildContext context, int jadwalid) async {
-    return await showDialog<bool>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Konfirmasi Hapus'),
-          content: Text('Apakah Anda yakin ingin menghapus jadwal pendampingan dengan ID: $jadwalid?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              style: ButtonStyle(
-                foregroundColor: MaterialStateProperty.all<Color>(Colors.red),
-              ),
-              child: const Text('Hapus'),
-            ),
-            const SizedBox(width: 10,),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Batal'),
-            ),
-          ],
-        );
-      },
-    ) ?? false;
   }
 
   void scrollToSection(int navIndex) {
