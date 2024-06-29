@@ -144,6 +144,7 @@ class _BKJadwalPageState extends State<BKJadwalPage> {
                                     'Nomor Jadwal: ${event.jadwalid}\n${event.initial} - ID Dampingan: ${event.reqid}\nPendamping Sebaya: ${event.psname}\nTempat Pendampingan: ${event.mediapendampingan}\n',
                                   ),
                                 ),
+                                const SizedBox(width: 5.0),
                                 isReported
                                 ? const Text("")
                                 : const Text("Laporan Belum ada", style: TextStyle(color: Colors.red)),
