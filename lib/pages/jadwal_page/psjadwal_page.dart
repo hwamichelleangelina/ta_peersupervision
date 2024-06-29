@@ -110,7 +110,8 @@ class _PSJadwalPageState extends State<PSJadwalPage> {
 
   void _showEventDialog(DateTime date, List<MyJadwal> events) {
     DateTime selectedDate = DateTime(date.year, date.month, date.day);
-    bool isPastDate = selectedDate.isBefore(DateTime.now());
+    DateTime today = DateTime.now();
+    bool isPastDate = selectedDate.isBefore(DateTime(today.year, today.month, today.day));
 
     showDialog(
       context: context,
