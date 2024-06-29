@@ -147,7 +147,7 @@ class _BKJadwalPageState extends State<BKJadwalPage> {
                                 const SizedBox(width: 5.0),
                                 isReported
                                 ? const Text("")
-                                : const Text("Laporan Belum ada", style: TextStyle(color: Colors.red)),
+                                : const Text("  Laporan Belum ada", style: TextStyle(color: Colors.red)),
                               ],
                             );
                           }
